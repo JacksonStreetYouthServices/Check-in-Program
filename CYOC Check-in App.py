@@ -6,7 +6,7 @@ Created on Fri Jul 01 11:44:13 2016
 """
 import os
 
-from CYOCapp import CYOC_GUI4 as gui
+import CYOC_GUI4 as gui
 
 
 if __name__ == "__main__":
