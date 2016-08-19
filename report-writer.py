@@ -72,7 +72,7 @@ class report(object):
                 rowi += 1
                 ws.write(rowi, col, date)
             col += 1
-        
+
 
     def ServicePointReport(self, title, titlesize=24, titlebg='#C390D4'):
         """input data and formatting into Access Report worksheet"""
