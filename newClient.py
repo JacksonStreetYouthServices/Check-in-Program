@@ -164,12 +164,16 @@ def submitClientInfo(App, subApp):
         names.append(var.get())
     # get date
     date = subApp.date.get()
+    # date of check-in to add to attendance list in dictionary
+    dateToday = str(dt.date.today().month) + '/' + str(dt.date.today().day) + '/' +\
+           str(dt.date.today().year)
     # save client info dictionary to file
     App.clients.add_new_client(ID, {'ID':ID,
                                         'First Name': names[0],
                                         'Middle Name': names[1],
                                         'Last Name': names[2],
-                                        'Date of Birth': date})
+                                        'Date of Birth': date,
+                                        'Attendance': [dateToday]})
     App.clients.save()
     # refresh name boxes
     gui.showNames(App)
