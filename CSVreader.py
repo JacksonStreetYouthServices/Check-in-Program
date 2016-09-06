@@ -169,7 +169,7 @@ class readWriteRows(object):
 #GenderID
     
 if __name__ == "__main__":
-    myFile = 'CYOC/sample-CYOC-YouthDatabase - Copy.csv'
+    myFile = 'sample-CYOC-YouthDatabase - Copy.csv'
     sample = readWriteRows(myFile)
     print sample.data['CYOC0001']['Middle Name']
     sample.update_client_answer('CYOC0001','Middle Name', 'Jake')
