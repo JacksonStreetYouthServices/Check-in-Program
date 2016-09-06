@@ -8,8 +8,8 @@ import sys
 import xlsxwriter as xlsx
 import CSVreader as csvr
 import datetime as dt
-#reload(sys)
-#sys.setdefaultencoding('utf8')
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 class report(object):
     """
@@ -30,7 +30,14 @@ class report(object):
             self.headers.append(item.decode('UTF-8'))
 #        self.headers = csvr.readRows(datafile)[0]
         ## get data of all youth
-        self.data = csvr.readWriteRows(datafile).data
+        data = csvr.readWriteRows(datafile).data
+        self.data={}
+        for key in data:
+            key = key.rstrip()
+            self.data[key]={}
+            for key2 in data[key]:
+                key2 = key2.rstrip()
+                self.data[key][key2]=data[key][key2].rstrip()
         ## get list of names and IDs
         self.nameIDlist = []
         for ID in self.data:
@@ -40,7 +47,11 @@ class report(object):
         self.nameIDlist.sort()
 
     def AccessReport(self, title, titlesize=24, titlebg='#A1D490', skiprow=1):
-        """input data and formatting into Access Report worksheet"""
+        """input data and formatting into Access Report worksheet
+            *merge first 5 cells for title
+            *extend rows to 20.22
+            *put dates in once cell each
+        """
         col = 0
         row = 0
         # title format
@@ -49,7 +60,8 @@ class report(object):
                                      'font_size': titlesize})
         # write title
         ws = self.worksheets[0]
-        ws.write(row, col, title, titlestyle)
+        ws.merge_range('A1:E1', title, titlestyle)
+#        ws.write(row, col, title, titlestyle)
         # write date of report
         row += 1
         ws.write(row, col, 'Report generated: ' + str(dt.date.today()))
@@ -62,16 +74,26 @@ class report(object):
             rowi = row
             ID = nameID[2]
             dic = self.data[ID]
-            name = dic['First Name'] + dic['Middle Name'] + dic['Last Name']
+            name = dic['First Name'] +' '+ dic['Middle Name'] +' '+ dic['Last Name']
             DOB = dic['Date of Birth']
-            attendance = dic['Attendance']
+            attendance = dic['Attendance'].strip('[').strip(']').split(', ')
             # write name
             ws.write(rowi, col, name, namestyle)
+            rowi += 1
+            # write 'Date of Birth'
+            ws.write(rowi, col, 'Date of Birth:')
+            rowi += 1
+            # write DOB
+            ws.write(rowi, col, DOB)
+            rowi += 1
+            # write 'Attendance'
+            ws.write(rowi, col, 'Attendance:')
             # write dates of attendance
             for date in attendance:
                 rowi += 1
-                ws.write(rowi, col, date)
+                ws.write(rowi, col, date.strip("'"))
             col += 1
+        ws.set_column(0, col, 21)
 
 
     def ServicePointReport(self, title, titlesize=24, titlebg='#C390D4'):
@@ -86,9 +108,11 @@ class report(object):
 
 if __name__=="__main__":
     datafile = "CYOC-YouthDatabase.csv"
-    wbname = "Youth Database Report.xlsx"
+    date = str(dt.date.today())
+    wbname = "Youth Database Report %s.xlsx" % date
     wsnames = ["Access Report", "Service Point Report"]
     # create report instance
     thisreport =  report(datafile, wbname, wsnames)
     thisreport.AccessReport('Albany Drop-in Monthly Youth Report')
     thisreport.close()
+    print 'open report under %s' % wbname
